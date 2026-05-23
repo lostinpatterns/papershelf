@@ -1,0 +1,64 @@
+{
+  "name": "papershelf",
+  "license": "MIT",
+  "version": "0.0.0",
+  "description": "Semantic search CLI for repository-local research.",
+  "keywords": [
+    "semantic-search",
+    "research",
+    "embeddings",
+    "reranking",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lostinpatterns/papershelf.git"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "main": "./dist/cli.js",
+  "types": "./dist/cli.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/cli.d.ts",
+      "default": "./dist/cli.js"
+    }
+  },
+  "bin": {
+    "papershelf": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "check": "pnpm lint:check && pnpm format:check && pnpm types:check",
+    "prepare": "husky",
+    "prepublishOnly": "pnpm build",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint:check": "eslint",
+    "lint:fix": "eslint --fix",
+    "start": "node dist/cli.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "types:check": "tsc --pretty --noEmit"
+  },
+  "files": [
+    "dist"
+  ],
+  "packageManager": "pnpm@10.30.3",
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.9.1",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.4",
+    "vitest": "^4.1.7"
+  }
+}
