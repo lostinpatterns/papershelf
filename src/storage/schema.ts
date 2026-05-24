@@ -1,3 +1,5 @@
+export const currentStorageSchemaVersion: number = 1;
+export const storageSchemaVersionFileName: string = '.papershelf-schema-version';
 export const documentsTableName: string = 'documents';
 export const chunksTableName: string = 'chunks';
 export const chunksEmbeddingHnswIndexName: string = 'chunks_embedding_hnsw_cosine_idx';

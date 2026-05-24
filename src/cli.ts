@@ -10,7 +10,7 @@ import type { CliResult, CommandContext, SearchOutputFormat } from './types.js';
 
 export const usage: string = `Usage:
   papershelf init
-  papershelf index
+  papershelf index [--rebuild]
   papershelf search "<question>" [--json]
 `;
 
@@ -34,6 +34,7 @@ export async function runCli(
       options: {
         help: { type: 'boolean', short: 'h' },
         json: { type: 'boolean' },
+        rebuild: { type: 'boolean' },
       },
     });
   } catch (error: unknown) {
@@ -60,7 +61,7 @@ export async function runCli(
         return await runInitCommand({ context });
 
       case 'index':
-        return await runIndexCommand({ context });
+        return await runIndexCommand({ context, rebuild: values['rebuild'] === true });
 
       case 'search': {
         const question = args.join(' ').trim();

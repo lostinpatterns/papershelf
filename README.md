@@ -37,7 +37,7 @@ pnpm add -D papershelf
 
 ```sh
 papershelf init
-papershelf index
+papershelf index [--rebuild]
 papershelf search "<question>" [--json]
 ```
 
@@ -46,9 +46,9 @@ papershelf search "<question>" [--json]
 papershelf keeps the source corpus and generated search index inside the repo:
 
 - `.papershelf/docs/` — user-added research documents, such as papers, books, specs, reports, or text notes.
-- `.papershelf/index/` — generated local PGlite database; safe to rebuild with `papershelf index`.
+- `.papershelf/index/` — generated local PGlite database; safe to rebuild with `papershelf index --rebuild`.
 
-The index uses bundled pgvector with an HNSW cosine index and fixed 1280-dimensional embeddings.
+The index uses bundled pgvector with an HNSW cosine index and fixed 1280-dimensional embeddings. If a future CLI version cannot use an existing generated index schema, run `papershelf index --rebuild` or delete `.papershelf/index/` and run `papershelf index`.
 
 ## Configuration
 
@@ -64,7 +64,7 @@ The intended ZeroEntropy integration uses standalone model endpoints only, not m
 
 - Text-only MVP: PDFs and other formats must be converted to `.txt`, `.md`, or `.markdown` before indexing.
 - Indexing and search require ZeroEntropy credentials and network access. If reranking fails, search returns embedding-order results instead.
-- `.papershelf/index/` is generated local index data and can be rebuilt with `papershelf index`.
+- `.papershelf/index/` is generated local index data and can be rebuilt with `papershelf index --rebuild`.
 
 ## Development
 

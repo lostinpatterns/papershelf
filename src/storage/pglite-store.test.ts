@@ -1,11 +1,16 @@
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { ChunkMetadata, EmbeddedChunk, IndexedDocument, PapershelfPaths } from '../types.js';
 import { acquireStorageLock, releaseStorageLock, type StorageLockHandle } from './lock.js';
 import { openVectorStore, type VectorStore } from './pglite-store.js';
-import { buildSchemaSql, buildVectorIndexSql } from './schema.js';
+import {
+  currentStorageSchemaVersion,
+  storageSchemaVersionFileName,
+  buildSchemaSql,
+  buildVectorIndexSql,
+} from './schema.js';
 
 describe('PGlite storage schema', () => {
   it('builds document/chunk tables with fixed-size vectors and an HNSW cosine index', () => {
@@ -126,6 +131,78 @@ describe('PGlite vector store', () => {
     }
   }, 30_000);
 
+  it('writes a schema version marker for fresh indexes', async () => {
+    const repoRoot = await createTemporaryDirectory();
+    const paths = createPaths(repoRoot);
+    const store = await openVectorStore({ paths, embeddingDimensions: 3 });
+
+    try {
+      await store.initialize();
+      await store.close();
+
+      await expect(readStorageSchemaVersion(paths.indexDir)).resolves.toBe(`${currentStorageSchemaVersion}\n`);
+    } finally {
+      await store.close();
+      await rm(repoRoot, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it('rejects non-empty indexes without a schema version marker', async () => {
+    const repoRoot = await createTemporaryDirectory();
+    const paths = createPaths(repoRoot);
+
+    try {
+      await writeNonEmptyIndexDirectory(paths.indexDir);
+
+      await expect(openVectorStore({ paths, embeddingDimensions: 3 })).rejects.toThrow(/papershelf index --rebuild/u);
+    } finally {
+      await rm(repoRoot, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it('rejects mismatched schema versions with rebuild guidance', async () => {
+    const repoRoot = await createTemporaryDirectory();
+    const paths = createPaths(repoRoot);
+
+    try {
+      await writeStorageSchemaVersion(paths.indexDir, currentStorageSchemaVersion + 1);
+
+      await expect(openVectorStore({ paths, embeddingDimensions: 3 })).rejects.toThrow(
+        /delete \.papershelf\/index\/ and run "papershelf index"/u,
+      );
+    } finally {
+      await rm(repoRoot, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it('rebuilds by replacing an incompatible existing index directory', async () => {
+    const repoRoot = await createTemporaryDirectory();
+    const paths = createPaths(repoRoot);
+    let store: VectorStore | undefined;
+
+    try {
+      await writeStorageSchemaVersion(paths.indexDir, currentStorageSchemaVersion + 1);
+
+      store = await openVectorStore({ paths, embeddingDimensions: 3, rebuild: true });
+      await store.initialize();
+
+      await expect(store.listDocuments()).resolves.toEqual([]);
+      await expect(readStorageSchemaVersion(paths.indexDir)).resolves.toBe(`${currentStorageSchemaVersion}\n`);
+      await store.upsertDocument(createDocument({ docId: '.papershelf/docs/rebuilt.md' }), [
+        createChunk('.papershelf/docs/rebuilt.md', 0, 'rebuilt passage', [1, 0, 0]),
+      ]);
+      await expect(store.search({ embedding: [1, 0, 0], limit: 1 })).resolves.toMatchObject([
+        { docId: '.papershelf/docs/rebuilt.md', chunkIndex: 0, text: 'rebuilt passage' },
+      ]);
+    } finally {
+      if (store !== undefined) {
+        await store.close();
+      }
+
+      await rm(repoRoot, { recursive: true, force: true });
+    }
+  }, 30_000);
+
   it('validates embedding dimensions before writing or searching', async () => {
     const repoRoot = await createTemporaryDirectory();
     const paths = createPaths(repoRoot);
@@ -144,6 +221,20 @@ describe('PGlite vector store', () => {
     }
   }, 30_000);
 });
+
+async function readStorageSchemaVersion(indexDir: string): Promise<string> {
+  return await readFile(path.join(indexDir, storageSchemaVersionFileName), 'utf8');
+}
+
+async function writeStorageSchemaVersion(indexDir: string, schemaVersion: number): Promise<void> {
+  await mkdir(indexDir, { recursive: true });
+  await writeFile(path.join(indexDir, storageSchemaVersionFileName), `${schemaVersion}\n`, 'utf8');
+}
+
+async function writeNonEmptyIndexDirectory(indexDir: string): Promise<void> {
+  await mkdir(indexDir, { recursive: true });
+  await writeFile(path.join(indexDir, 'stale-index-file'), 'stale', 'utf8');
+}
 
 async function createTemporaryDirectory(): Promise<string> {
   return await mkdtemp(path.join(tmpdir(), 'papershelf-storage-'));

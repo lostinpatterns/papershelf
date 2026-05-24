@@ -60,6 +60,19 @@ describe('runCli', () => {
     }
   });
 
+  it('accepts index --rebuild and requires ZEROENTROPY_API_KEY before rebuilding', async () => {
+    const cwd = await createTemporaryDirectory();
+
+    try {
+      await expect(runCli(['index', '--rebuild'], { cwd, env: {} })).resolves.toEqual({
+        stderr: 'Missing ZEROENTROPY_API_KEY environment variable. Set it before running index or search.',
+        exitCode: 1,
+      });
+    } finally {
+      await rm(cwd, { recursive: true, force: true });
+    }
+  });
+
   it('requires ZEROENTROPY_API_KEY for indexing', async () => {
     const cwd = await createTemporaryDirectory();
 

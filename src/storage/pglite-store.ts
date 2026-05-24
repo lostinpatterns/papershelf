@@ -1,13 +1,20 @@
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import * as path from 'node:path';
 import { PGlite, type PGliteInterface, type Transaction } from '@electric-sql/pglite';
 import { vector } from '@electric-sql/pglite/vector';
 import type { ChunkMetadata, EmbeddedChunk, IndexedDocument, PapershelfPaths, SearchCandidate } from '../types.js';
 import { acquireStorageLock, releaseStorageLock, type StorageLockHandle } from './lock.js';
-import { buildSchemaSql, buildVectorIndexSql } from './schema.js';
+import {
+  currentStorageSchemaVersion,
+  storageSchemaVersionFileName,
+  buildSchemaSql,
+  buildVectorIndexSql,
+} from './schema.js';
 
 export type OpenVectorStoreOptions = {
   paths: PapershelfPaths;
   embeddingDimensions: number;
+  rebuild?: boolean;
 };
 
 export type VectorSearchOptions = {
@@ -43,13 +50,19 @@ type SearchRow = {
 
 export async function openVectorStore(options: OpenVectorStoreOptions): Promise<VectorStore> {
   validateEmbeddingDimensions(options.embeddingDimensions);
-  await mkdir(options.paths.indexDir, { recursive: true });
 
   const lock = await acquireStorageLock({ dataDir: options.paths.indexDir });
 
   try {
+    if (options.rebuild === true) {
+      await rm(options.paths.indexDir, { recursive: true, force: true });
+    }
+
+    await mkdir(options.paths.indexDir, { recursive: true });
+    await assertStorageSchemaVersion(options.paths.indexDir);
+
     const db: PGliteInterface = await PGlite.create(options.paths.indexDir, { extensions: { vector } });
-    return new PGliteVectorStore(db, lock, options.embeddingDimensions);
+    return new PGliteVectorStore(db, lock, options.embeddingDimensions, options.paths.indexDir);
   } catch (error) {
     await releaseStorageLock(lock);
     throw error;
@@ -61,17 +74,20 @@ class PGliteVectorStore implements VectorStore {
   private readonly db: PGliteInterface;
   private readonly lock: StorageLockHandle;
   private readonly embeddingDimensions: number;
+  private readonly indexDir: string;
 
-  public constructor(db: PGliteInterface, lock: StorageLockHandle, embeddingDimensions: number) {
+  public constructor(db: PGliteInterface, lock: StorageLockHandle, embeddingDimensions: number, indexDir: string) {
     this.db = db;
     this.lock = lock;
     this.embeddingDimensions = embeddingDimensions;
+    this.indexDir = indexDir;
   }
 
   public async initialize(): Promise<void> {
     this.ensureOpen();
     await this.db.exec(buildSchemaSql({ embeddingDimensions: this.embeddingDimensions }));
     await this.db.exec(buildVectorIndexSql());
+    await writeStorageSchemaVersion(this.indexDir);
   }
 
   public async listDocuments(): Promise<readonly IndexedDocument[]> {
@@ -189,6 +205,54 @@ class PGliteVectorStore implements VectorStore {
       serializeEmbedding(chunk.embedding, this.embeddingDimensions);
     }
   }
+}
+
+async function assertStorageSchemaVersion(indexDir: string): Promise<void> {
+  const entries = await readdir(indexDir);
+
+  if (entries.length === 0) {
+    return;
+  }
+
+  const storedVersion = await readStorageSchemaVersion(indexDir);
+
+  if (storedVersion === String(currentStorageSchemaVersion)) {
+    return;
+  }
+
+  const detail =
+    storedVersion === undefined ? 'missing schema version marker' : `found schema version ${storedVersion}`;
+  throw createIncompatibleIndexSchemaError(detail);
+}
+
+async function readStorageSchemaVersion(indexDir: string): Promise<string | undefined> {
+  try {
+    return (await readFile(storageSchemaVersionPath(indexDir), 'utf8')).trim();
+  } catch (error) {
+    if (isErrnoException(error, 'ENOENT')) {
+      return undefined;
+    }
+
+    throw error;
+  }
+}
+
+async function writeStorageSchemaVersion(indexDir: string): Promise<void> {
+  await writeFile(storageSchemaVersionPath(indexDir), `${currentStorageSchemaVersion}\n`, 'utf8');
+}
+
+function storageSchemaVersionPath(indexDir: string): string {
+  return path.join(indexDir, storageSchemaVersionFileName);
+}
+
+function createIncompatibleIndexSchemaError(detail: string): Error {
+  return new Error(
+    `Papershelf index schema is incompatible: ${detail}. Run "papershelf index --rebuild", or delete .papershelf/index/ and run "papershelf index".`,
+  );
+}
+
+function isErrnoException(error: unknown, code: string): error is NodeJS.ErrnoException {
+  return error instanceof Error && 'code' in error && (error as NodeJS.ErrnoException).code === code;
 }
 
 async function upsertDocumentRow(tx: Transaction, document: IndexedDocument): Promise<void> {
