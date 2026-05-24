@@ -73,7 +73,6 @@ describe('PGlite vector store', () => {
         createChunk(docId, 1, 'beta passage', [0.5, 0.5, 0], { section: 'Introduction > Method' }),
       ]);
 
-      await expect(store.getDocument(docId)).resolves.toEqual(document);
       await expect(store.listDocuments()).resolves.toEqual([document]);
 
       const searchResults = await store.search({ embedding: [1, 0, 0], limit: 2 });
@@ -100,7 +99,7 @@ describe('PGlite vector store', () => {
       });
 
       await store.upsertDocument(replacementDocument, [createChunk(docId, 0, 'replacement gamma passage', [0, 0, 1])]);
-      await expect(store.getDocument(docId)).resolves.toEqual(replacementDocument);
+      await expect(store.listDocuments()).resolves.toEqual([replacementDocument]);
       await expect(store.search({ embedding: [1, 0, 0], limit: 10 })).resolves.toEqual([
         {
           docId,
@@ -116,7 +115,6 @@ describe('PGlite vector store', () => {
 
       await expect(store.listDocuments()).resolves.toEqual([replacementDocument]);
       await store.deleteDocument(docId);
-      await expect(store.getDocument(docId)).resolves.toBeUndefined();
       await expect(store.listDocuments()).resolves.toEqual([]);
       await expect(store.search({ embedding: [1, 0, 0], limit: 10 })).resolves.toEqual([]);
     } finally {

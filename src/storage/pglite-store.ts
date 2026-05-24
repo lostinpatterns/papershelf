@@ -17,7 +17,6 @@ export type VectorSearchOptions = {
 
 export type VectorStore = {
   initialize(): Promise<void>;
-  getDocument(docId: string): Promise<IndexedDocument | undefined>;
   listDocuments(): Promise<readonly IndexedDocument[]>;
   deleteDocument(docId: string): Promise<void>;
   upsertDocument(document: IndexedDocument, chunks: readonly EmbeddedChunk[]): Promise<void>;
@@ -73,20 +72,6 @@ class PGliteVectorStore implements VectorStore {
     this.ensureOpen();
     await this.db.exec(buildSchemaSql({ embeddingDimensions: this.embeddingDimensions }));
     await this.db.exec(buildVectorIndexSql());
-  }
-
-  public async getDocument(docId: string): Promise<IndexedDocument | undefined> {
-    this.ensureOpen();
-
-    const result = await this.db.query<DocumentRow>(
-      `SELECT doc_id, content_hash, chunker_version, embedding_model, embedding_dimensions, indexed_at
-       FROM documents
-       WHERE doc_id = $1`,
-      [docId],
-    );
-    const row = result.rows[0];
-
-    return row === undefined ? undefined : documentFromRow(row);
   }
 
   public async listDocuments(): Promise<readonly IndexedDocument[]> {

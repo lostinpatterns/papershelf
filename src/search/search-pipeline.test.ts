@@ -194,10 +194,6 @@ class RecordingSearchStore implements VectorStore {
     return undefined;
   }
 
-  public async getDocument(): Promise<IndexedDocument | undefined> {
-    return undefined;
-  }
-
   public async listDocuments(): Promise<readonly IndexedDocument[]> {
     return [];
   }

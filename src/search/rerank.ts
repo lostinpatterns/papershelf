@@ -14,11 +14,6 @@ export type ApplyRerankerOptions = {
   resultLimit: number;
 };
 
-export type RerankerOrdering = {
-  results: readonly RerankResult[];
-  failedOpen: boolean;
-};
-
 export async function applyReranker(options: ApplyRerankerOptions): Promise<readonly SearchResult[]> {
   validateNonNegativeInteger(options.candidateLimit, 'Candidate limit');
   validateNonNegativeInteger(options.resultLimit, 'Result limit');

@@ -133,10 +133,6 @@ class RecordingStore implements VectorStore {
     this.initialized = true;
   }
 
-  public async getDocument(): Promise<IndexedDocument | undefined> {
-    return undefined;
-  }
-
   public async listDocuments(): Promise<readonly IndexedDocument[]> {
     return [];
   }
