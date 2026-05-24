@@ -6,6 +6,10 @@ settings:
 
 importers:
   .:
+    dependencies:
+      '@electric-sql/pglite':
+        specifier: ^0.4.5
+        version: 0.4.5
     devDependencies:
       '@commitlint/cli':
         specifier: ^21.0.1
@@ -140,6 +144,10 @@ packages:
     resolution:
       { integrity: sha512-4u7w8jcoCUFWhjWnASYzZHAP34OqOtuFBN87nQmFvqda03YU0T6z+yB4w0gSAMpekiRqqGk5rt+qSlW+a2vSEg== }
     engines: { node: '>=22.12.0' }
+
+  '@electric-sql/pglite@0.4.5':
+    resolution:
+      { integrity: sha512-aGG2zGEyZzGWKy8P+9ZoNUV0jxt1+hgbeTf+bVAYyxVZZLXg3/9aFlfLxb08AYZVAfAkQlQIysmWjhc5hwDG8g== }
 
   '@conventional-changelog/git-client@2.7.0':
     resolution:
@@ -1592,6 +1600,8 @@ snapshots:
     dependencies:
       conventional-commits-parser: 6.4.0
       picocolors: 1.1.1
+
+  '@electric-sql/pglite@0.4.5': {}
 
   '@conventional-changelog/git-client@2.7.0(conventional-commits-parser@6.4.0)':
     dependencies:
