@@ -6,6 +6,8 @@ export type ChunkerOptions = {
   maxCharacters: number;
 };
 
+export const textBoundaryChunkerVersion: number = 1;
+
 export const defaultChunkerOptions: ChunkerOptions = {
   targetWords: 450,
   overlapWords: 90,

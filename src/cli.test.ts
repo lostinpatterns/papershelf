@@ -60,6 +60,19 @@ describe('runCli', () => {
     }
   });
 
+  it('requires ZEROENTROPY_API_KEY for indexing', async () => {
+    const cwd = await createTemporaryDirectory();
+
+    try {
+      await expect(runCli(['index'], { cwd, env: {} })).resolves.toEqual({
+        stderr: 'Missing ZEROENTROPY_API_KEY environment variable. Set it before running index or search.',
+        exitCode: 1,
+      });
+    } finally {
+      await rm(cwd, { recursive: true, force: true });
+    }
+  });
+
   it('requires a search question', async () => {
     await expect(runCli(['search'])).resolves.toEqual({
       stderr: `Missing search question.\n${usage}`,
