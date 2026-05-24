@@ -1,3 +1,8 @@
+---
+name: papershelf
+description: Search this repository's `.papershelf/docs/` research corpus with the `papershelf` CLI. Use before answering questions grounded in local research documents, when a coding/design decision may be informed by papers, books, specs, reports, or notes in the corpus, or when the user asks for corpus-backed evidence. Cite relevant passages from `papershelf search` results and state when results are weak or inconclusive.
+---
+
 # papershelf
 
 This repo has a research corpus at `.papershelf/docs/`.
