@@ -2,7 +2,7 @@
 
 papershelf is a CLI for adding semantic search over a repository-local `.papershelf/` research corpus. It uses ZeroEntropy standalone embedding/reranking models and stores the searchable index locally with PGlite + pgvector. It is intended for AI coding agents and maintainers who want coding and design work to cite relevant local research documents.
 
-> Status: early implementation. The package currently exposes the CLI entrypoint and command surface while the indexing and search implementation is being built.
+> Status: text-first MVP. `init`, incremental `index`, and `search` are implemented for `.txt`, `.md`, and `.markdown` files when `ZEROENTROPY_API_KEY` is configured.
 
 ## Intended use
 
@@ -18,7 +18,7 @@ That skill tells agents to search the corpus before answering questions grounded
 
 Agents can use plain text output for human-readable results or `papershelf search "<question>" --json` for structured results.
 
-## Planned workflow
+## Workflow
 
 1. Run `papershelf init` in a repo to create `.papershelf/docs/` and install the project-local agent skill.
 2. Add research documents, such as papers, books, specs, reports, or text notes, to `.papershelf/docs/`.
@@ -58,6 +58,12 @@ The intended ZeroEntropy integration uses standalone model endpoints only, not m
 - embedding model `zembed-1`
 - embedding dimension `1280`
 - reranker model `zerank-2`
+
+## Limitations
+
+- Text-only MVP: PDFs and other formats must be converted to `.txt`, `.md`, or `.markdown` before indexing.
+- Indexing and search require ZeroEntropy credentials and network access. If reranking fails, search returns embedding-order results instead.
+- `.papershelf/index/` is generated local index data and can be rebuilt with `papershelf index`.
 
 ## Development
 

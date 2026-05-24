@@ -32,7 +32,10 @@
   "scripts": {
     "build": "tsc",
     "check": "pnpm lint:check && pnpm format:check && pnpm types:check",
+    "clean": "rm -rf dist",
+    "prebuild": "pnpm clean",
     "prepare": "husky",
+    "prepack": "pnpm build",
     "prepublishOnly": "pnpm build",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
