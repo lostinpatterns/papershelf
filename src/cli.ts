@@ -2,6 +2,11 @@
 
 import { parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
+import { runIndexCommand } from './commands/index.js';
+import { runInitCommand } from './commands/init.js';
+import { runSearchCommand } from './commands/search.js';
+import { formatError } from './errors.js';
+import type { CliResult, CommandContext, SearchOutputFormat } from './types.js';
 
 export const usage: string = `Usage:
   papershelf init
@@ -9,23 +14,35 @@ export const usage: string = `Usage:
   papershelf search "<question>" [--json]
 `;
 
-export type CliResult = {
-  stdout?: string;
-  stderr?: string;
-  exitCode: number;
-};
+export function createCommandContext(): CommandContext {
+  return {
+    cwd: process.cwd(),
+    env: process.env,
+  };
+}
 
-export function runCli(argv: readonly string[]): CliResult {
-  const { values, positionals } = parseArgs({
-    args: [...argv],
-    allowPositionals: true,
-    options: {
-      help: { type: 'boolean', short: 'h' },
-      json: { type: 'boolean' },
-    },
-  });
+export async function runCli(
+  argv: readonly string[],
+  context: CommandContext = createCommandContext(),
+): Promise<CliResult> {
+  let parsed: ReturnType<typeof parseArgs>;
 
-  if (values.help || positionals.length === 0) {
+  try {
+    parsed = parseArgs({
+      args: [...argv],
+      allowPositionals: true,
+      options: {
+        help: { type: 'boolean', short: 'h' },
+        json: { type: 'boolean' },
+      },
+    });
+  } catch (error: unknown) {
+    return { stderr: formatError(error), exitCode: 1 };
+  }
+
+  const { values, positionals } = parsed;
+
+  if (values['help'] || positionals.length === 0) {
     return { stdout: usage, exitCode: 0 };
   }
 
@@ -37,20 +54,30 @@ export function runCli(argv: readonly string[]): CliResult {
 
   const args = positionals.slice(1);
 
-  switch (command) {
-    case 'init':
-      return { stdout: 'TODO: init', exitCode: 0 };
+  try {
+    switch (command) {
+      case 'init':
+        return await runInitCommand({ context });
 
-    case 'index':
-      return { stdout: 'TODO: index', exitCode: 0 };
+      case 'index':
+        return await runIndexCommand({ context });
 
-    case 'search': {
-      const jsonFlag = values.json ? ' --json' : '';
-      return { stdout: `TODO: search ${args.join(' ')}${jsonFlag}`, exitCode: 0 };
+      case 'search': {
+        const question = args.join(' ').trim();
+
+        if (question.length === 0) {
+          return { stderr: `Missing search question.\n${usage}`, exitCode: 1 };
+        }
+
+        const format: SearchOutputFormat = values['json'] ? 'json' : 'text';
+        return await runSearchCommand({ context, question, format });
+      }
+
+      default:
+        return { stderr: `Unknown command: ${command}\n${usage}`, exitCode: 1 };
     }
-
-    default:
-      return { stderr: `Unknown command: ${command}\n${usage}`, exitCode: 1 };
+  } catch (error: unknown) {
+    return { stderr: formatError(error), exitCode: 1 };
   }
 }
 
@@ -64,15 +91,15 @@ function printResult(result: CliResult): void {
   }
 }
 
-export function main(argv: readonly string[] = process.argv.slice(2)): void {
-  const result = runCli(argv);
+export async function main(argv: readonly string[] = process.argv.slice(2)): Promise<void> {
+  const result = await runCli(argv);
   printResult(result);
 
   if (result.exitCode !== 0) {
-    process.exit(result.exitCode);
+    process.exitCode = result.exitCode;
   }
 }
 
 if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main();
+  void main();
 }
