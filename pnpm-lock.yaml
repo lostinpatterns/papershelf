@@ -47,6 +47,9 @@ importers:
       vitest:
         specifier: ^4.1.7
         version: 4.1.7(@types/node@25.9.1)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
+      vitest-evals:
+        specifier: ^0.11.0
+        version: 0.11.0(tinyrainbow@3.1.0)(vitest@4.1.7(@types/node@25.9.1)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0)))
 
 packages:
   '@babel/code-frame@7.29.0':
@@ -1389,6 +1392,20 @@ packages:
       yaml:
         optional: true
 
+  vitest-evals@0.11.0:
+    resolution:
+      { integrity: sha512-XkLiIMYPH6f+R5h+Is4tSafhRr8NCane3P50/y+rXJShE6RSAa8hppww2OwzmeQ/LEP4phqXXgGwt8HykfN0yQ== }
+    peerDependencies:
+      ai: '>=4 <7'
+      tinyrainbow: '>=2 <4'
+      vitest: '>=4 <5'
+      zod: '>=3 <5'
+    peerDependenciesMeta:
+      ai:
+        optional: true
+      zod:
+        optional: true
+
   vitest@4.1.7:
     resolution:
       { integrity: sha512-flYyaFd2CgoCoU+0UKt3pxksgC+S02iTDN0n3LtqaMeXsI9SBcdNujc2k0DeFLzUn/0k538yNjOSdwgCqcrwJA== }
@@ -2507,6 +2524,11 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.6.1
       yaml: 2.9.0
+
+  vitest-evals@0.11.0(tinyrainbow@3.1.0)(vitest@4.1.7(@types/node@25.9.1)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))):
+    dependencies:
+      tinyrainbow: 3.1.0
+      vitest: 4.1.7(@types/node@25.9.1)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0))
 
   vitest@4.1.7(@types/node@25.9.1)(vite@8.0.14(@types/node@25.9.1)(jiti@2.6.1)(yaml@2.9.0)):
     dependencies:
