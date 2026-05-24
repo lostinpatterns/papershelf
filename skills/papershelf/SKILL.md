@@ -13,6 +13,14 @@ Before answering questions grounded in the corpus, or making substantive decisio
 papershelf search "<specific question>"
 ```
 
-Cite relevant passages from the search results when using corpus evidence.
+If your final answer relies on papershelf evidence, include an `Evidence used` section with the query, source path, and a short exact quote from the retrieved passage.
+
+When you expect to cite a result, prefer JSON output so the citation source is unambiguous:
+
+```sh
+pnpm papershelf search "<specific question>" --json
+```
+
+Quote from the returned result's `text` or `snippet`. A later direct read of the source file may be useful for context, but it does not replace citing the retrieved search result.
 
 Use focused queries. If the returned passages are weak, irrelevant, or inconclusive, say so; do not claim the corpus supports a conclusion unless the retrieved passages actually do. If you add documents to `.papershelf/docs/`, run `papershelf index` first.
