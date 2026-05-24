@@ -24,6 +24,7 @@ describe('ZeroEntropyClient', () => {
         model: 'zembed-1',
         input: ['first chunk', 'second chunk'],
         inputType: 'document',
+        dimensions: 1280,
       }),
     ).resolves.toEqual({
       embeddings: [
@@ -45,6 +46,7 @@ describe('ZeroEntropyClient', () => {
       input: ['first chunk', 'second chunk'],
       input_type: 'document',
       encoding_format: 'float',
+      dimensions: 1280,
     });
   });
 
@@ -93,6 +95,7 @@ describe('ZeroEntropyClient', () => {
         model: 'zembed-1',
         input: ['chunk'],
         inputType: 'document',
+        dimensions: 1280,
       }),
     ).rejects.toThrow(/ZeroEntropy embed request failed with HTTP 401 Unauthorized: bad api key/u);
   });
@@ -119,6 +122,7 @@ describe('ZeroEntropyClient', () => {
         model: 'zembed-1',
         input: ['chunk'],
         inputType: 'document',
+        dimensions: 1280,
       }),
     ).rejects.toThrow(/Malformed ZeroEntropy embed response: expected results\[0\]\.embedding/u);
   });
@@ -132,6 +136,7 @@ describe('ZeroEntropyClient', () => {
         model: 'zembed-1',
         input: ['first chunk', 'second chunk'],
         inputType: 'document',
+        dimensions: 1280,
       }),
     ).rejects.toThrow(/embedding count mismatch: expected 2, received 1/u);
   });

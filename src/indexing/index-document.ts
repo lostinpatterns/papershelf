@@ -53,6 +53,7 @@ async function embedChunks(
     model: options.embeddingModel,
     input: chunks.map((chunk) => chunk.text),
     inputType: 'document',
+    dimensions: options.embeddingDimensions,
   });
 
   return response.embeddings;

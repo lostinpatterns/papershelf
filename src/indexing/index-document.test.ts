@@ -23,6 +23,7 @@ describe('indexDocument', () => {
         model: 'zembed-1',
         input: ['# Heading\n\nThis passage should be embedded.'],
         inputType: 'document',
+        dimensions: 3,
       },
     ]);
     expect(result.document).toEqual({

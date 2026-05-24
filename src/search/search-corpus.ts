@@ -47,6 +47,7 @@ async function embedQuery(options: SearchCorpusOptions, query: string): Promise<
     model: options.config.embeddingModel,
     input: [query],
     inputType: 'query',
+    dimensions: options.config.embeddingDimensions,
   });
 
   if (response.embeddings.length !== 1) {

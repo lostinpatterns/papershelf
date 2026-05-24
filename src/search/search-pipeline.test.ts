@@ -117,6 +117,7 @@ describe('searchCorpus', () => {
         model: 'zembed-1',
         input: ['how does the method work?'],
         inputType: 'query',
+        dimensions: 3,
       },
     ]);
     expect(store.searchCalls).toEqual([{ embedding: [0.2, 0.1, 0], limit: 2 }]);

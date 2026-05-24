@@ -11,6 +11,7 @@ export type EmbedRequest = {
   model: EmbeddingModel;
   input: readonly string[];
   inputType: EmbeddingInputType;
+  dimensions: number;
   signal?: AbortSignal;
 };
 
@@ -56,6 +57,7 @@ export class ZeroEntropyClient {
         input: [...request.input],
         input_type: request.inputType,
         encoding_format: 'float',
+        dimensions: request.dimensions,
       },
       request.signal,
     );
