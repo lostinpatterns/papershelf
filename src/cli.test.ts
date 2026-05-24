@@ -80,11 +80,17 @@ describe('runCli', () => {
     });
   });
 
-  it('dispatches the search command with json output selected', async () => {
-    await expect(runCli(['search', 'how does this work?', '--json'])).resolves.toEqual({
-      stderr: 'Not implemented: search command',
-      exitCode: 1,
-    });
+  it('requires ZEROENTROPY_API_KEY for search', async () => {
+    const cwd = await createTemporaryDirectory();
+
+    try {
+      await expect(runCli(['search', 'how does this work?', '--json'], { cwd, env: {} })).resolves.toEqual({
+        stderr: 'Missing ZEROENTROPY_API_KEY environment variable. Set it before running index or search.',
+        exitCode: 1,
+      });
+    } finally {
+      await rm(cwd, { recursive: true, force: true });
+    }
   });
 
   it('reports unknown commands', async () => {
