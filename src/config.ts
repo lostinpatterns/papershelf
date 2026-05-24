@@ -24,9 +24,11 @@ export function loadConfig(env: Readonly<NodeJS.ProcessEnv>): PapershelfConfig {
     throw new Error('Missing ZEROENTROPY_API_KEY environment variable. Set it before running index or search.');
   }
 
+  const zeroEntropyBaseUrl = env['ZEROENTROPY_BASE_URL']?.trim() || defaultZeroEntropyBaseUrl;
+
   return {
     zeroEntropyApiKey,
-    zeroEntropyBaseUrl: defaultZeroEntropyBaseUrl,
+    zeroEntropyBaseUrl,
     embeddingModel: defaultEmbeddingModel,
     embeddingDimensions: defaultEmbeddingDimensions,
     rerankModel: defaultRerankModel,

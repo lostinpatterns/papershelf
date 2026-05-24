@@ -55,6 +55,7 @@ The index uses bundled pgvector with an HNSW cosine index and fixed 1280-dimensi
 The intended ZeroEntropy integration uses standalone model endpoints only, not managed zsearch document storage:
 
 - `ZEROENTROPY_API_KEY`
+- Optional `ZEROENTROPY_BASE_URL` for compatible/local test endpoints; defaults to `https://api.zeroentropy.dev/v1`
 - embedding model `zembed-1`
 - embedding dimension `1280`
 - reranker model `zerank-2`
@@ -71,6 +72,8 @@ The intended ZeroEntropy integration uses standalone model endpoints only, not m
 pnpm install
 pnpm build
 pnpm test
+pnpm test:unit
+pnpm test:integration
 pnpm check
 ```
 

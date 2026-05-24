@@ -42,7 +42,9 @@
     "lint:check": "eslint",
     "lint:fix": "eslint --fix",
     "start": "node dist/cli.js",
-    "test": "vitest run",
+    "test": "pnpm test:unit",
+    "test:integration": "vitest run --project integration",
+    "test:unit": "vitest run --project unit",
     "typecheck": "tsc --noEmit",
     "types:check": "tsc --pretty --noEmit"
   },
