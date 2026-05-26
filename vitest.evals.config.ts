@@ -8,7 +8,7 @@ const config: ViteUserConfig = defineConfig({
     hookTimeout: 30_000,
     reporters: ['vitest-evals/reporter'],
     env: {
-      VITEST_EVALS_REPLAY_MODE: process.env['VITEST_EVALS_REPLAY_MODE'] ?? 'auto',
+      VITEST_EVALS_REPLAY_MODE: process.env['VITEST_EVALS_REPLAY_MODE'] ?? 'strict',
       VITEST_EVALS_REPLAY_DIR: '.vitest-evals/recordings',
     },
   },

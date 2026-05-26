@@ -1,0 +1,44 @@
+{
+  "writtenAt": "2026-05-26T02:23:38.494Z",
+  "toolName": "zeroentropy.rerank",
+  "input": {
+    "model": "zerank-2",
+    "query": "Which passage describes microbes making shredded vegetables acidic in a vessel?",
+    "documents": [
+      "Cabbage packed with salt began bubbling by the third day. The crock smelled pleasantly sour once lactic bacteria took hold.",
+      "The chef dried shiitake stems and simmered them into broth. What looked like kitchen scraps became a deep umami base for noodles.",
+      "At the dig, students brushed ash from a cooking hearth and labeled pottery shards by layer. The oldest charcoal sample came from the north trench.",
+      "Tomato seedlings thrived after the grower switched to clay ollas that release water slowly near roots. The buried jars kept leaves dry and cut watering trips during the heat wave.",
+      "Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow."
+    ]
+  },
+  "output": {
+    "results": [
+      {
+        "index": 0,
+        "relevanceScore": 0.2955144675516937
+      },
+      {
+        "index": 3,
+        "relevanceScore": 0.05938456695489119
+      },
+      {
+        "index": 1,
+        "relevanceScore": 0.05533106645869109
+      },
+      {
+        "index": 4,
+        "relevanceScore": 0.04686434888450832
+      },
+      {
+        "index": 2,
+        "relevanceScore": 0.03389516415917814
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d7123de3ee4d49a9b89c0af86dd345f2d38616b48c4ac032b9fa68f41cb7080a",
+    "version": "papershelf-semantic-search-v1",
+    "mode": "record"
+  }
+}

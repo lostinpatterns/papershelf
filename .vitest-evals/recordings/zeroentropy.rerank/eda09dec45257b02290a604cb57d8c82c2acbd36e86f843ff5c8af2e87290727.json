@@ -1,0 +1,44 @@
+{
+  "writtenAt": "2026-05-26T02:23:52.885Z",
+  "toolName": "zeroentropy.rerank",
+  "input": {
+    "model": "zerank-2",
+    "query": "Which passage says a paved area uses planted depressions to absorb street water?",
+    "documents": [
+      "Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow.\n\nDuring storms, runoff soaked into planted basins beside the curb after the parking lot retrofit. Inspectors described the planted depressions as shallow rain gardens that slow street water, feed sedges and switchgrass, and keep oil grit from rushing into the drain.\n\nMaintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin. Maintenance notes listed pruning dates, sediment depth, inlet checks, seed mixes, volunteer days, and repair tasks for each basin.",
+      "Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow. Crews mapped curb grades and soil beds after storms while noting drains, slopes, mulch, roots, stones, and flow.",
+      "Tomato seedlings thrived after the grower switched to clay ollas that release water slowly near roots. The buried jars kept leaves dry and cut watering trips during the heat wave.",
+      "The courier swapped a delivery truck for an e-cargo bike on downtown routes. Narrow lanes became faster, and bakery orders arrived without exhaust fumes.",
+      "In the memory ward, residents sang familiar choruses while a guitarist kept a steady tempo. Nurses noted calmer evenings after the sessions."
+    ]
+  },
+  "output": {
+    "results": [
+      {
+        "index": 0,
+        "relevanceScore": 0.829381475617195
+      },
+      {
+        "index": 1,
+        "relevanceScore": 0.09975048911968512
+      },
+      {
+        "index": 2,
+        "relevanceScore": 0.060086650174007626
+      },
+      {
+        "index": 3,
+        "relevanceScore": 0.031523222754001344
+      },
+      {
+        "index": 4,
+        "relevanceScore": 0.02595735719779685
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "eda09dec45257b02290a604cb57d8c82c2acbd36e86f843ff5c8af2e87290727",
+    "version": "papershelf-semantic-search-v1",
+    "mode": "record"
+  }
+}
