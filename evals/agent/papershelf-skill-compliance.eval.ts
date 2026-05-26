@@ -123,8 +123,8 @@ describeEval(
       const citedSearch = searchInvocations.find((invocation) => invocation.query === evidence.query);
       const citedResult = citedSearch?.json.results.find((searchResult) => searchResult.docId === evidence.sourcePath);
 
-      expect(searchInvocations.length, 'pnpm papershelf search ... --json calls').toBeGreaterThan(0);
-      expect(citedSearch, 'Evidence used query matches an actual pnpm papershelf search ... --json call').toBeDefined();
+      expect(searchInvocations.length, 'papershelf search ... --json calls').toBeGreaterThan(0);
+      expect(citedSearch, 'Evidence used query matches an actual papershelf search ... --json call').toBeDefined();
       expect(citedResult, 'Evidence used source path matches a returned JSON result docId').toBeDefined();
       expect(
         citedResult !== undefined &&
@@ -149,8 +149,8 @@ describeEval(
       const citedSearch = searchInvocations.find((invocation) => invocation.query === evidence.query);
       const citedResult = citedSearch?.json.results.find((searchResult) => searchResult.docId === evidence.sourcePath);
 
-      expect(searchInvocations.length, 'pnpm papershelf search ... --json calls').toBeGreaterThan(0);
-      expect(citedSearch, 'Evidence used query matches an actual pnpm papershelf search ... --json call').toBeDefined();
+      expect(searchInvocations.length, 'papershelf search ... --json calls').toBeGreaterThan(0);
+      expect(citedSearch, 'Evidence used query matches an actual papershelf search ... --json call').toBeDefined();
       expect(citedResult, 'Evidence used source path matches a returned JSON result docId').toBeDefined();
 
       if (citedResult === undefined || citedSearch === undefined) {
@@ -235,7 +235,7 @@ function createLongChunkInput(): PapershelfAgentEvalInput {
       '/skill:papershelf\n\n' +
       'Use the local Papershelf corpus to answer this question: ' +
       'Which diagnostic method reveals the hidden nitrogen valve leak in the greenhouse pump manual?\n\n' +
-      'Run a focused `pnpm papershelf search ... --json` semantic search first. ' +
+      'Run a focused `papershelf search ... --json` semantic search first. ' +
       'Use the returned JSON metadata to identify the relevant chunk line range, then call the read tool on the source path with offset and limit covering only that returned line range rather than the whole file.\n\n' +
       'Answer in one sentence, then include an "Evidence used" section with exactly these fields:\n' +
       '- query: <the exact search query you ran>\n' +
@@ -298,7 +298,7 @@ function extractSearchInvocations(calls: readonly ToolCallRecord[]): SearchInvoc
     }
 
     const command = readCommandArgument(call);
-    const parsedCommand = parsePnpmPapershelfSearchCommand(command);
+    const parsedCommand = parsePapershelfSearchCommand(command);
 
     if (parsedCommand === undefined || !parsedCommand.usesJson) {
       return [];
@@ -354,15 +354,15 @@ function readIntegerArgument(call: ToolCallRecord, name: string): number | undef
   return Number.isInteger(value) && typeof value === 'number' ? value : undefined;
 }
 
-function parsePnpmPapershelfSearchCommand(command: string): { query: string; usesJson: boolean } | undefined {
+function parsePapershelfSearchCommand(command: string): { query: string; usesJson: boolean } | undefined {
   const words = splitShellWords(command);
-  const searchStart = findSubsequence(words, ['pnpm', 'papershelf', 'search']);
+  const searchStart = findSubsequence(words, ['papershelf', 'search']);
 
   if (searchStart === -1) {
     return undefined;
   }
 
-  const searchArgs = words.slice(searchStart + 3, firstShellOperatorIndex(words, searchStart + 3));
+  const searchArgs = words.slice(searchStart + 2, firstShellOperatorIndex(words, searchStart + 2));
   const usesJson = searchArgs.includes('--json');
   const query = searchArgs
     .filter((word) => word !== '--json' && !word.startsWith('-'))

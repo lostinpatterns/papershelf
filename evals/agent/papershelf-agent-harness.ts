@@ -137,8 +137,8 @@ async function prepareFixtureRepo(
   );
   await installLocalPapershelfBin(cwd);
 
-  const env = createPapershelfEnv(zeroEntropyBaseUrl);
-  const initResult = await runProcess('pnpm', ['papershelf', 'init'], {
+  const env = createPapershelfEnv(zeroEntropyBaseUrl, cwd);
+  const initResult = await runProcess('papershelf', ['init'], {
     cwd,
     env,
     timeoutMs: commandTimeoutMs,
@@ -151,7 +151,7 @@ async function prepareFixtureRepo(
 
   await writeEvalDocuments(cwd, documents);
 
-  const indexResult = await runProcess('pnpm', ['papershelf', 'index', '--rebuild'], {
+  const indexResult = await runProcess('papershelf', ['index', '--rebuild'], {
     cwd,
     env,
     timeoutMs: commandTimeoutMs,
@@ -228,15 +228,19 @@ async function runPiAgent(
 
   return await runProcess('pi', args, {
     cwd,
-    env: createPapershelfEnv(zeroEntropyBaseUrl),
+    env: createPapershelfEnv(zeroEntropyBaseUrl, cwd),
     timeoutMs: Number(process.env['PAPERSHELF_AGENT_EVAL_TIMEOUT_MS'] ?? defaultPiTimeoutMs),
     signal,
   });
 }
 
-function createPapershelfEnv(zeroEntropyBaseUrl: string): NodeJS.ProcessEnv {
+function createPapershelfEnv(zeroEntropyBaseUrl: string, cwd?: string): NodeJS.ProcessEnv {
+  const localBinDir = cwd === undefined ? undefined : path.join(cwd, 'node_modules', '.bin');
+  const existingPath = process.env['PATH'] ?? '';
+
   return {
     ...process.env,
+    PATH: localBinDir === undefined ? existingPath : `${localBinDir}${path.delimiter}${existingPath}`,
     ZEROENTROPY_API_KEY: evalApiKey,
     ZEROENTROPY_BASE_URL: zeroEntropyBaseUrl,
   };

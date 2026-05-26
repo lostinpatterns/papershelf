@@ -8,14 +8,14 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           include: ['src/**/*.test.ts'],
-          exclude: ['src/**/*.integration.test.ts'],
+          exclude: ['**/*.integration.test.ts'],
         },
       },
       {
         test: {
           name: 'integration',
           environment: 'node',
-          include: ['src/test/integration/**/*.integration.test.ts'],
+          include: ['tests/integration/**/*.integration.test.ts'],
         },
       },
     ],
