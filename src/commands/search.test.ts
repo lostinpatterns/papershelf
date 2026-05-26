@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { PapershelfConfig } from '../config.js';
 import type { EmbedResponse, RerankResponse } from '../providers/zeroentropy.js';
 import type { SearchCorpusOptions, SearchProvider } from '../search/search-corpus.js';
-import type { OpenVectorStoreOptions, VectorStore } from '../storage/pglite-store.js';
+import type { OpenVectorStoreOptions, VectorStore } from '../storage/libsql-store.js';
 import type { IndexedDocument, PapershelfPaths, SearchCandidate, SearchResult } from '../types.js';
 import { runSearchCommand, type SearchCommandDependencies } from './search.js';
 

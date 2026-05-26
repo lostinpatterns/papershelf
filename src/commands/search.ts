@@ -3,7 +3,7 @@ import { resolvePapershelfPaths } from '../paths.js';
 import { ZeroEntropyClient } from '../providers/zeroentropy.js';
 import { formatSearchResults, type FormatSearchResultsOptions } from '../search/format.js';
 import { searchCorpus, type SearchCorpusOptions, type SearchProvider } from '../search/search-corpus.js';
-import { openVectorStore, type OpenVectorStoreOptions, type VectorStore } from '../storage/pglite-store.js';
+import { openVectorStore, type OpenVectorStoreOptions, type VectorStore } from '../storage/libsql-store.js';
 import type { CliResult, CommandContext, PapershelfPaths, SearchOutputFormat, SearchResult } from '../types.js';
 
 export type SearchCommandDependencies = {

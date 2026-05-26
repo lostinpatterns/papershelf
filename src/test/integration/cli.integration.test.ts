@@ -37,7 +37,7 @@ describe('papershelf CLI integration', () => {
       );
       await writeFile(
         path.join(repoRoot, '.papershelf', 'docs', 'storage.md'),
-        '# Local vector storage\n\nPGlite can store repository-local vector indexes. pgvector supports cosine similarity search over embeddings.\n',
+        '# Local vector storage\n\nlibSQL can store repository-local vector indexes. Native vector functions support cosine similarity search over embeddings.\n',
         'utf8',
       );
 
@@ -80,7 +80,7 @@ describe('papershelf CLI integration', () => {
         chunkIndex: 0,
         metadata: { heading: 'Local vector storage' },
       });
-      expect(firstResult?.text).toContain('PGlite can store repository-local vector indexes.');
+      expect(firstResult?.text).toContain('libSQL can store repository-local vector indexes.');
       expect(firstResult?.relevanceScore).toBeGreaterThan(0.9);
       expect(getEmbedRecords(zeroEntropy.records, 'query')).toHaveLength(1);
       expect(getRecordsByPath(zeroEntropy.records, '/v1/models/rerank')).toHaveLength(1);
@@ -280,8 +280,8 @@ function classifyText(text: string, inputType: string): TextTopic {
   const lowerText = text.toLowerCase();
 
   if (
-    lowerText.includes('pglite') ||
-    lowerText.includes('pgvector') ||
+    lowerText.includes('libsql') ||
+    lowerText.includes('native vector') ||
     lowerText.includes('repository-local vector') ||
     (inputType === 'query' && lowerText.includes('stored locally'))
   ) {

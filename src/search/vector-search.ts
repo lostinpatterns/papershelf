@@ -1,5 +1,5 @@
 import type { SearchCandidate } from '../types.js';
-import type { VectorStore } from '../storage/pglite-store.js';
+import type { VectorStore } from '../storage/libsql-store.js';
 
 export type VectorSearchRequest = {
   store: VectorStore;

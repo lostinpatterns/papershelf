@@ -4,7 +4,7 @@ import { indexCorpus, type IndexCorpusOptions } from '../indexing/index-corpus.j
 import type { DocumentEmbedder } from '../indexing/index-document.js';
 import { resolvePapershelfPaths } from '../paths.js';
 import { ZeroEntropyClient } from '../providers/zeroentropy.js';
-import { openVectorStore, type OpenVectorStoreOptions, type VectorStore } from '../storage/pglite-store.js';
+import { openVectorStore, type OpenVectorStoreOptions, type VectorStore } from '../storage/libsql-store.js';
 import type { CliResult, CommandContext, PapershelfPaths } from '../types.js';
 
 export type IndexCommandDependencies = {

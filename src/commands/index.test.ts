@@ -3,7 +3,7 @@ import type { PapershelfConfig } from '../config.js';
 import type { IndexCorpusOptions } from '../indexing/index-corpus.js';
 import type { DocumentEmbedder } from '../indexing/index-document.js';
 import type { EmbedResponse } from '../providers/zeroentropy.js';
-import type { OpenVectorStoreOptions, VectorStore } from '../storage/pglite-store.js';
+import type { OpenVectorStoreOptions, VectorStore } from '../storage/libsql-store.js';
 import type { IndexedDocument, PapershelfPaths, SearchCandidate } from '../types.js';
 import { runIndexCommand, type IndexCommandDependencies } from './index.js';
 

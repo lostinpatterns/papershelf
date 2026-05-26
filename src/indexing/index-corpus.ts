@@ -1,7 +1,7 @@
 import type { PapershelfConfig } from '../config.js';
 import type { ChunkerOptions } from '../chunkers/text-boundaries.js';
 import { hashSourceFileBytes, listSourceFiles, readSourceFileText } from '../source-files/index.js';
-import type { VectorStore } from '../storage/pglite-store.js';
+import type { VectorStore } from '../storage/libsql-store.js';
 import type { CliResult, PapershelfPaths, SourceDocument, SourceFile, SourceFileFingerprint } from '../types.js';
 import { indexDocument, type DocumentEmbedder } from './index-document.js';
 import { buildIndexManifest } from './manifest.js';

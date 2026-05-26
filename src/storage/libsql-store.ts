@@ -1,7 +1,7 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import * as path from 'node:path';
-import { PGlite, type PGliteInterface, type Transaction } from '@electric-sql/pglite';
-import { vector } from '@electric-sql/pglite/vector';
+import { pathToFileURL } from 'node:url';
+import { createClient, type Client, type Row, type Transaction, type Value } from '@libsql/client';
 import type { ChunkMetadata, EmbeddedChunk, IndexedDocument, PapershelfPaths, SearchCandidate } from '../types.js';
 import { acquireStorageLock, releaseStorageLock, type StorageLockHandle } from './lock.js';
 import {
@@ -9,6 +9,7 @@ import {
   storageSchemaVersionFileName,
   buildSchemaSql,
   buildVectorIndexSql,
+  chunksEmbeddingDiskAnnIndexName,
 } from './schema.js';
 
 export type OpenVectorStoreOptions = {
@@ -31,27 +32,13 @@ export type VectorStore = {
   close(): Promise<void>;
 };
 
-type DocumentRow = {
-  doc_id: string;
-  content_hash: string;
-  chunker_version: number;
-  embedding_model: string;
-  embedding_dimensions: number;
-  indexed_at: Date | string;
-};
-
-type SearchRow = {
-  doc_id: string;
-  chunk_index: number;
-  chunk_text: string;
-  metadata: unknown;
-  distance: number;
-};
+const databaseFileName = 'papershelf.db';
 
 export async function openVectorStore(options: OpenVectorStoreOptions): Promise<VectorStore> {
   validateEmbeddingDimensions(options.embeddingDimensions);
 
   const lock = await acquireStorageLock({ dataDir: options.paths.indexDir });
+  let db: Client | undefined;
 
   try {
     if (options.rebuild === true) {
@@ -61,22 +48,25 @@ export async function openVectorStore(options: OpenVectorStoreOptions): Promise<
     await mkdir(options.paths.indexDir, { recursive: true });
     await assertStorageSchemaVersion(options.paths.indexDir);
 
-    const db: PGliteInterface = await PGlite.create(options.paths.indexDir, { extensions: { vector } });
-    return new PGliteVectorStore(db, lock, options.embeddingDimensions, options.paths.indexDir);
+    db = createClient({ url: pathToFileURL(databaseFilePath(options.paths.indexDir)).href });
+    await db.execute('PRAGMA foreign_keys = ON');
+
+    return new LibsqlVectorStore(db, lock, options.embeddingDimensions, options.paths.indexDir);
   } catch (error) {
+    db?.close();
     await releaseStorageLock(lock);
     throw error;
   }
 }
 
-class PGliteVectorStore implements VectorStore {
+class LibsqlVectorStore implements VectorStore {
   private closed: boolean = false;
-  private readonly db: PGliteInterface;
+  private readonly db: Client;
   private readonly lock: StorageLockHandle;
   private readonly embeddingDimensions: number;
   private readonly indexDir: string;
 
-  public constructor(db: PGliteInterface, lock: StorageLockHandle, embeddingDimensions: number, indexDir: string) {
+  public constructor(db: Client, lock: StorageLockHandle, embeddingDimensions: number, indexDir: string) {
     this.db = db;
     this.lock = lock;
     this.embeddingDimensions = embeddingDimensions;
@@ -85,15 +75,15 @@ class PGliteVectorStore implements VectorStore {
 
   public async initialize(): Promise<void> {
     this.ensureOpen();
-    await this.db.exec(buildSchemaSql({ embeddingDimensions: this.embeddingDimensions }));
-    await this.db.exec(buildVectorIndexSql());
+    await this.db.executeMultiple(buildSchemaSql({ embeddingDimensions: this.embeddingDimensions }));
+    await this.db.execute(buildVectorIndexSql());
     await writeStorageSchemaVersion(this.indexDir);
   }
 
   public async listDocuments(): Promise<readonly IndexedDocument[]> {
     this.ensureOpen();
 
-    const result = await this.db.query<DocumentRow>(
+    const result = await this.db.execute(
       `SELECT doc_id, content_hash, chunker_version, embedding_model, embedding_dimensions, indexed_at
        FROM documents
        ORDER BY doc_id`,
@@ -105,9 +95,9 @@ class PGliteVectorStore implements VectorStore {
   public async deleteDocument(docId: string): Promise<void> {
     this.ensureOpen();
 
-    await this.db.transaction(async (tx) => {
-      await tx.query('DELETE FROM chunks WHERE doc_id = $1', [docId]);
-      await tx.query('DELETE FROM documents WHERE doc_id = $1', [docId]);
+    await withWriteTransaction(this.db, async (tx) => {
+      await tx.execute({ sql: 'DELETE FROM chunks WHERE doc_id = ?', args: [docId] });
+      await tx.execute({ sql: 'DELETE FROM documents WHERE doc_id = ?', args: [docId] });
     });
   }
 
@@ -116,22 +106,22 @@ class PGliteVectorStore implements VectorStore {
     this.validateDocument(document);
     this.validateChunks(document.docId, chunks);
 
-    await this.db.transaction(async (tx) => {
+    await withWriteTransaction(this.db, async (tx) => {
       await upsertDocumentRow(tx, document);
-      await tx.query('DELETE FROM chunks WHERE doc_id = $1', [document.docId]);
+      await tx.execute({ sql: 'DELETE FROM chunks WHERE doc_id = ?', args: [document.docId] });
 
       for (const chunk of chunks) {
-        await tx.query(
-          `INSERT INTO chunks (doc_id, chunk_index, chunk_text, embedding, metadata)
-           VALUES ($1, $2, $3, $4::vector, $5::jsonb)`,
-          [
+        await tx.execute({
+          sql: `INSERT INTO chunks (doc_id, chunk_index, chunk_text, embedding, metadata)
+                VALUES (?, ?, ?, vector32(?), json(?))`,
+          args: [
             chunk.docId,
             chunk.chunkIndex,
             chunk.text,
             serializeEmbedding(chunk.embedding, this.embeddingDimensions),
             serializeMetadata(chunk.metadata),
           ],
-        );
+        });
       }
     });
   }
@@ -144,13 +134,19 @@ class PGliteVectorStore implements VectorStore {
       return [];
     }
 
-    const result = await this.db.query<SearchRow>(
-      `SELECT doc_id, chunk_index, chunk_text, metadata, embedding <=> $1::vector AS distance
-       FROM chunks
-       ORDER BY embedding <=> $1::vector
-       LIMIT $2`,
-      [serializeEmbedding(options.embedding, this.embeddingDimensions), options.limit],
-    );
+    const serializedEmbedding = serializeEmbedding(options.embedding, this.embeddingDimensions);
+    const result = await this.db.execute({
+      sql: `SELECT chunks.doc_id,
+                   chunks.chunk_index,
+                   chunks.chunk_text,
+                   chunks.metadata,
+                   vector_distance_cos(chunks.embedding, vector32(?)) AS distance
+            FROM vector_top_k('${chunksEmbeddingDiskAnnIndexName}', vector32(?), ?) AS nearest
+            JOIN chunks ON chunks.rowid = nearest.id
+            ORDER BY distance ASC
+            LIMIT ?`,
+      args: [serializedEmbedding, serializedEmbedding, options.limit, options.limit],
+    });
 
     return result.rows.map(searchCandidateFromRow);
   }
@@ -164,7 +160,7 @@ class PGliteVectorStore implements VectorStore {
 
     try {
       if (!this.db.closed) {
-        await this.db.close();
+        this.db.close();
       }
     } finally {
       await releaseStorageLock(this.lock);
@@ -207,6 +203,36 @@ class PGliteVectorStore implements VectorStore {
   }
 }
 
+async function withWriteTransaction(db: Client, callback: (tx: Transaction) => Promise<void>): Promise<void> {
+  const tx = await db.transaction('write');
+
+  try {
+    await callback(tx);
+    await tx.commit();
+  } catch (error) {
+    await rollbackTransaction(tx);
+    throw error;
+  } finally {
+    if (!tx.closed) {
+      tx.close();
+    }
+  }
+}
+
+async function rollbackTransaction(tx: Transaction): Promise<void> {
+  if (tx.closed) {
+    return;
+  }
+
+  try {
+    await tx.rollback();
+  } catch {
+    if (!tx.closed) {
+      tx.close();
+    }
+  }
+}
+
 async function assertStorageSchemaVersion(indexDir: string): Promise<void> {
   const entries = await readdir(indexDir);
 
@@ -245,6 +271,10 @@ function storageSchemaVersionPath(indexDir: string): string {
   return path.join(indexDir, storageSchemaVersionFileName);
 }
 
+function databaseFilePath(indexDir: string): string {
+  return path.join(indexDir, databaseFileName);
+}
+
 function createIncompatibleIndexSchemaError(detail: string): Error {
   return new Error(
     `Papershelf index schema is incompatible: ${detail}. Run "papershelf index --rebuild", or delete .papershelf/index/ and run "papershelf index".`,
@@ -256,22 +286,22 @@ function isErrnoException(error: unknown, code: string): error is NodeJS.ErrnoEx
 }
 
 async function upsertDocumentRow(tx: Transaction, document: IndexedDocument): Promise<void> {
-  await tx.query(
-    `INSERT INTO documents (
+  await tx.execute({
+    sql: `INSERT INTO documents (
        doc_id,
        content_hash,
        chunker_version,
        embedding_model,
        embedding_dimensions,
        indexed_at
-     ) VALUES ($1, $2, $3, $4, $5, $6::timestamptz)
+     ) VALUES (?, ?, ?, ?, ?, ?)
      ON CONFLICT (doc_id) DO UPDATE SET
        content_hash = EXCLUDED.content_hash,
        chunker_version = EXCLUDED.chunker_version,
        embedding_model = EXCLUDED.embedding_model,
        embedding_dimensions = EXCLUDED.embedding_dimensions,
        indexed_at = EXCLUDED.indexed_at`,
-    [
+    args: [
       document.docId,
       document.contentHash,
       document.chunkerVersion,
@@ -279,28 +309,28 @@ async function upsertDocumentRow(tx: Transaction, document: IndexedDocument): Pr
       document.embeddingDimensions,
       document.indexedAt.toISOString(),
     ],
-  );
+  });
 }
 
-function documentFromRow(row: DocumentRow): IndexedDocument {
+function documentFromRow(row: Row): IndexedDocument {
   return {
-    docId: row.doc_id,
-    contentHash: row.content_hash,
-    chunkerVersion: row.chunker_version,
-    embeddingModel: row.embedding_model,
-    embeddingDimensions: row.embedding_dimensions,
-    indexedAt: parseIndexedAt(row.indexed_at),
+    docId: readStringColumn(row, 'doc_id'),
+    contentHash: readStringColumn(row, 'content_hash'),
+    chunkerVersion: readNumberColumn(row, 'chunker_version'),
+    embeddingModel: readStringColumn(row, 'embedding_model'),
+    embeddingDimensions: readNumberColumn(row, 'embedding_dimensions'),
+    indexedAt: parseIndexedAt(readStringColumn(row, 'indexed_at')),
   };
 }
 
-function searchCandidateFromRow(row: SearchRow): SearchCandidate {
+function searchCandidateFromRow(row: Row): SearchCandidate {
   const candidate: SearchCandidate = {
-    docId: row.doc_id,
-    chunkIndex: row.chunk_index,
-    text: row.chunk_text,
-    distance: row.distance,
+    docId: readStringColumn(row, 'doc_id'),
+    chunkIndex: readNumberColumn(row, 'chunk_index'),
+    text: readStringColumn(row, 'chunk_text'),
+    distance: readNumberColumn(row, 'distance'),
   };
-  const metadata = parseMetadata(row.metadata);
+  const metadata = parseMetadata(row['metadata']);
 
   if (hasMetadata(metadata)) {
     candidate.metadata = metadata;
@@ -309,11 +339,37 @@ function searchCandidateFromRow(row: SearchRow): SearchCandidate {
   return candidate;
 }
 
-function parseIndexedAt(value: Date | string): Date {
-  if (value instanceof Date) {
-    return value;
+function readStringColumn(row: Row, column: string): string {
+  const value = readColumn(row, column);
+
+  if (typeof value !== 'string') {
+    throw new Error(`Invalid ${column} value in vector store: expected string.`);
   }
 
+  return value;
+}
+
+function readNumberColumn(row: Row, column: string): number {
+  const value = readColumn(row, column);
+
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    throw new Error(`Invalid ${column} value in vector store: expected finite number.`);
+  }
+
+  return value;
+}
+
+function readColumn(row: Row, column: string): Value {
+  const value = row[column];
+
+  if (value === undefined) {
+    throw new Error(`Missing ${column} value in vector store row.`);
+  }
+
+  return value;
+}
+
+function parseIndexedAt(value: string): Date {
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {

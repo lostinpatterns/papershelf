@@ -1,7 +1,7 @@
 import type { PapershelfConfig } from '../config.js';
 import type { SearchResult } from '../types.js';
 import type { EmbedRequest, EmbedResponse } from '../providers/zeroentropy.js';
-import type { VectorStore } from '../storage/pglite-store.js';
+import type { VectorStore } from '../storage/libsql-store.js';
 import { applyReranker, type Reranker } from './rerank.js';
 import { vectorSearch } from './vector-search.js';
 

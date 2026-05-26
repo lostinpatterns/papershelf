@@ -9,7 +9,7 @@ import type { EmbedRequest, EmbedResponse, RerankRequest, RerankResponse } from 
 import { ZeroEntropyClient } from '../../src/providers/zeroentropy.js';
 import { formatSearchResults } from '../../src/search/format.js';
 import { searchCorpus, type SearchProvider } from '../../src/search/search-corpus.js';
-import { openVectorStore } from '../../src/storage/pglite-store.js';
+import { openVectorStore } from '../../src/storage/libsql-store.js';
 import type { PapershelfPaths } from '../../src/types.js';
 import { createHarness, type Harness, type JsonValue, type SimpleToolCallRecord } from 'vitest-evals/harness';
 import { executeWithReplay, normalizeReplayMetadata } from 'vitest-evals/replay';

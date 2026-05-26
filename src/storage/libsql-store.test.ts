@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { ChunkMetadata, EmbeddedChunk, IndexedDocument, PapershelfPaths } from '../types.js';
 import { acquireStorageLock, releaseStorageLock, type StorageLockHandle } from './lock.js';
-import { openVectorStore, type VectorStore } from './pglite-store.js';
+import { openVectorStore, type VectorStore } from './libsql-store.js';
 import {
   currentStorageSchemaVersion,
   storageSchemaVersionFileName,
@@ -12,18 +12,17 @@ import {
   buildVectorIndexSql,
 } from './schema.js';
 
-describe('PGlite storage schema', () => {
-  it('builds document/chunk tables with fixed-size vectors and an HNSW cosine index', () => {
+describe('libSQL storage schema', () => {
+  it('builds document/chunk tables with fixed-size vectors and a DiskANN cosine index', () => {
     const schemaSql = buildSchemaSql({ embeddingDimensions: 1280 });
     const indexSql = buildVectorIndexSql();
 
-    expect(schemaSql).toContain('CREATE EXTENSION IF NOT EXISTS vector');
     expect(schemaSql).toContain('CREATE TABLE IF NOT EXISTS documents');
     expect(schemaSql).toContain('CREATE TABLE IF NOT EXISTS chunks');
-    expect(schemaSql).toContain('embedding vector(1280) NOT NULL');
+    expect(schemaSql).toContain('embedding F32_BLOB(1280) NOT NULL');
+    expect(schemaSql).toContain("metadata TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(metadata))");
     expect(schemaSql).toContain('PRIMARY KEY (doc_id, chunk_index)');
-    expect(indexSql).toContain('USING hnsw');
-    expect(indexSql).toContain('vector_cosine_ops');
+    expect(indexSql).toContain('libsql_vector_idx(embedding)');
   });
 
   it('rejects invalid embedding dimensions', () => {
@@ -38,16 +37,15 @@ describe('storage lock', () => {
     let firstLock: StorageLockHandle | undefined;
 
     try {
-      firstLock = await acquireStorageLock({ dataDir, timeoutMs: 100 });
+      firstLock = await acquireStorageLock({ dataDir });
 
-      expect(firstLock.acquired).toBe(true);
       expect(firstLock.lockDir).toBe(`${path.resolve(dataDir)}.lock`);
-      await expect(acquireStorageLock({ dataDir, timeoutMs: 1 })).rejects.toThrow(/locked by another process/u);
+      await expect(acquireStorageLock({ dataDir })).rejects.toThrow(/locked by another process/u);
 
       await releaseStorageLock(firstLock);
       firstLock = undefined;
 
-      const secondLock = await acquireStorageLock({ dataDir, timeoutMs: 100 });
+      const secondLock = await acquireStorageLock({ dataDir });
       await releaseStorageLock(secondLock);
     } finally {
       if (firstLock !== undefined) {
@@ -59,7 +57,7 @@ describe('storage lock', () => {
   });
 });
 
-describe('PGlite vector store', () => {
+describe('libSQL vector store', () => {
   it('initializes schema, upserts replacement chunks, searches by cosine distance, deletes, and reopens cleanly', async () => {
     const repoRoot = await createTemporaryDirectory();
     const paths = createPaths(repoRoot);

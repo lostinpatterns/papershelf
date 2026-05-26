@@ -72,6 +72,6 @@
     "vitest-evals": "^0.11.0"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.4.5"
+    "@libsql/client": "^0.17.3"
   }
 }

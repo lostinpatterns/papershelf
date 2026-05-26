@@ -1,6 +1,6 @@
 # papershelf
 
-papershelf is a CLI for adding semantic search over a repository-local `.papershelf/` research corpus. It uses ZeroEntropy standalone embedding/reranking models and stores the searchable index locally with PGlite + pgvector. It is intended for AI coding agents and maintainers who want coding and design work to cite relevant local research documents.
+papershelf is a CLI for adding semantic search over a repository-local `.papershelf/` research corpus. It uses ZeroEntropy standalone embedding/reranking models and stores the searchable index locally with libSQL native vectors. It is intended for AI coding agents and maintainers who want coding and design work to cite relevant local research documents.
 
 > Status: text-first MVP. `init`, incremental `index`, and `search` are implemented for `.txt`, `.md`, and `.markdown` files when `ZEROENTROPY_API_KEY` is configured.
 
@@ -46,9 +46,9 @@ papershelf search "<question>" [--json]
 papershelf keeps the source corpus and generated search index inside the repo:
 
 - `.papershelf/docs/` — user-added research documents, such as papers, books, specs, reports, or text notes.
-- `.papershelf/index/` — generated local PGlite database; safe to rebuild with `papershelf index --rebuild`.
+- `.papershelf/index/` — generated local libSQL database; safe to rebuild with `papershelf index --rebuild`.
 
-The index uses bundled pgvector with an HNSW cosine index and fixed 1280-dimensional embeddings. If a future CLI version cannot use an existing generated index schema, run `papershelf index --rebuild` or delete `.papershelf/index/` and run `papershelf index`.
+The index uses libSQL native `F32_BLOB` vectors with a DiskANN cosine index and fixed 1280-dimensional embeddings. If a future CLI version cannot use an existing generated index schema, run `papershelf index --rebuild` or delete `.papershelf/index/` and run `papershelf index`.
 
 ## Configuration
 

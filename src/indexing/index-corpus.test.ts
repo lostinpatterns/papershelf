@@ -5,7 +5,7 @@ import * as path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { PapershelfConfig } from '../config.js';
 import type { EmbedRequest, EmbedResponse } from '../providers/zeroentropy.js';
-import type { VectorStore } from '../storage/pglite-store.js';
+import type { VectorStore } from '../storage/libsql-store.js';
 import type { EmbeddedChunk, IndexedDocument, PapershelfPaths, SearchCandidate } from '../types.js';
 import { indexCorpus } from './index-corpus.js';
 import type { DocumentEmbedder } from './index-document.js';
