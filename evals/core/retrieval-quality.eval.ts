@@ -1,7 +1,11 @@
 import { expect } from 'vitest';
 import { describeEval, toolCalls } from 'vitest-evals';
-import { papershelfEvals } from '../helpers.js';
-import type { PapershelfEvalDocument, PapershelfEvalInput, PapershelfEvalResult } from '../harness.js';
+import {
+  papershelfHarness,
+  type PapershelfEvalDocument,
+  type PapershelfEvalInput,
+  type PapershelfEvalResult,
+} from './papershelf-search-harness.js';
 
 const mrrFloor = 0.85;
 
@@ -107,7 +111,7 @@ const queries = [
   },
 ];
 
-describeEval('papershelf semantic search', papershelfEvals, (it) => {
+describeEval('papershelf semantic search', { harness: papershelfHarness }, (it) => {
   it('retrieves paraphrased queries from a 12-document corpus with one multi-chunk document', async ({ run }) => {
     const reciprocalRanks: number[] = [];
 

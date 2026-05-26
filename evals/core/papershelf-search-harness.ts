@@ -1,16 +1,16 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import * as path from 'node:path';
-import { defaultChunkerOptions, textBoundaryChunkerVersion } from '../src/chunkers/text-boundaries.js';
-import { defaultEmbeddingDimensions, defaultZeroEntropyBaseUrl, type PapershelfConfig } from '../src/config.js';
-import { indexCorpus } from '../src/indexing/index-corpus.js';
-import type { DocumentEmbedder } from '../src/indexing/index-document.js';
-import type { EmbedRequest, EmbedResponse, RerankRequest, RerankResponse } from '../src/providers/zeroentropy.js';
-import { ZeroEntropyClient } from '../src/providers/zeroentropy.js';
-import { formatSearchResults } from '../src/search/format.js';
-import { searchCorpus, type SearchProvider } from '../src/search/search-corpus.js';
-import { openVectorStore } from '../src/storage/pglite-store.js';
-import type { PapershelfPaths } from '../src/types.js';
+import { defaultChunkerOptions, textBoundaryChunkerVersion } from '../../src/chunkers/text-boundaries.js';
+import { defaultEmbeddingDimensions, defaultZeroEntropyBaseUrl, type PapershelfConfig } from '../../src/config.js';
+import { indexCorpus } from '../../src/indexing/index-corpus.js';
+import type { DocumentEmbedder } from '../../src/indexing/index-document.js';
+import type { EmbedRequest, EmbedResponse, RerankRequest, RerankResponse } from '../../src/providers/zeroentropy.js';
+import { ZeroEntropyClient } from '../../src/providers/zeroentropy.js';
+import { formatSearchResults } from '../../src/search/format.js';
+import { searchCorpus, type SearchProvider } from '../../src/search/search-corpus.js';
+import { openVectorStore } from '../../src/storage/pglite-store.js';
+import type { PapershelfPaths } from '../../src/types.js';
 import { createHarness, type Harness, type JsonValue, type SimpleToolCallRecord } from 'vitest-evals/harness';
 import { executeWithReplay, normalizeReplayMetadata } from 'vitest-evals/replay';
 
