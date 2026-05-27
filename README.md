@@ -42,6 +42,7 @@ papershelf targets that retrieval gap: maintainers keep a repo-local Markdown/pl
   - [Search JSON contract](#search-json-contract)
   - [Citation contract](#citation-contract)
 - [Development and evals](#development-and-evals)
+- [Where it helps most](#where-it-helps-most)
 - [License](#license)
 
 ## Quickstart
@@ -233,6 +234,10 @@ The eval harnesses return normalized runs: app-facing `output`, traceable `sessi
 Provider calls for the core evals are recorded under `.vitest-evals/recordings/`, and the eval config runs in strict replay mode by default. Use `pnpm evals:record` with `ZEROENTROPY_API_KEY` when intentionally refreshing recordings.
 
 The optional agent compliance eval is gated by `PAPERSHELF_RUN_AGENT_EVALS=1`. It runs a Pi agent against the installed papershelf skill and asserts trace-level behavior: the agent must call `papershelf search ... --json`, cite an exact returned query/source/quote, and use returned line metadata for targeted reads in long documents.
+
+## Where it helps most
+
+The useful pattern is focused: papershelf helps agents reach relevant repo-local guidance with less document context. Ordinary tools can still work for well-named or exact-keyword docs, but papershelf can keep agents from loading long guides or opening many similar files. The advantage is clearest for large prose corpora, conceptual queries, lexically similar distractors, and task wording that differs from source wording.
 
 ## License
 
