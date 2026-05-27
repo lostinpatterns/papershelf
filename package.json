@@ -27,7 +27,7 @@
     }
   },
   "bin": {
-    "papershelf": "./dist/cli.js"
+    "papershelf": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
