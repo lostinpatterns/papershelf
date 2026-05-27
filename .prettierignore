@@ -1,0 +1,5 @@
+*.yaml
+*.astro
+site/dist/
+site/.astro/
+site/node_modules/
