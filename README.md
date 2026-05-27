@@ -9,16 +9,16 @@ Coding agents already have `read`, `rg`, and `find`; papershelf is not a replace
 Use when:
 
 - an agent needs evidence from repo-local prose before coding or making a design decision
-- the relevant material is long, distributed, or vocabulary-mismatched with the task
-- exact search would require guessing many keywords or opening many similar files
+- the corpus is large, distributed, vocabulary-mismatched, or otherwise awkward to navigate with exact search
 - answers should cite reproducible source paths, chunks, line ranges, and quotes
 
 ## Why papershelf
 
-- **Agents need project evidence, not just model memory** — papershelf makes local research and reference material discoverable at the moment an agent needs it.
-- **Research and reference material should stay repository-scoped** — documents and generated search data live with the project instead of in a separate managed document store.
-- **Search output should be auditable** — agents can cite the exact query, source path, chunk, line range, and quote they used.
-- **Maintainers own the corpus** — humans decide what belongs in `.papershelf/docs/`; agents consume it through a narrow, explicit protocol.
+papershelf keeps agent-facing research close to the code it informs.
+
+- **Repo-local by default** — source documents and generated index data live with the project, not in a separate managed document store.
+- **Auditable retrieval** — search results expose source paths, chunks, line ranges, and quotes so agents can justify conclusions with reproducible evidence.
+- **Context stays focused** — agents retrieve only task-relevant passages on demand instead of loading broad reference material into every prompt.
 
 ## Table of Contents
 
