@@ -6,6 +6,8 @@ This project follows Conventional Commits for commit messages. Release entries s
 
 ## Unreleased
 
+## 0.2.0
+
 - Added `papershelf help`, `--help`/`-h`, and `--version`/`-v` CLI entry points.
 
 ## 0.1.0
