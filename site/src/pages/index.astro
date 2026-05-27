@@ -1,10 +1,56 @@
+---
+const siteTitle = "papershelf";
+const siteDescription = "Repo-local semantic search for coding agents";
+const siteName = "papershelf";
+const themeColor = "#faf7ef";
+const baseUrl = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
+const siteOrigin = Astro.site ?? new URL("https://lostinpatterns.github.io");
+const assetPath = (path: string) => `${baseUrl}${path.replace(/^\//, "")}`;
+const assetUrl = (path: string) => new URL(assetPath(path), siteOrigin).toString();
+const canonicalUrl = new URL(baseUrl, siteOrigin).toString().replace(/\/$/, "");
+const socialImageUrl = assetUrl("og-image.png");
+const socialImageAlt = `${siteTitle} — ${siteDescription}`;
+---
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>papershelf</title>
-    <meta name="description" content="Repo-local semantic search for coding agents" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{siteTitle}</title>
+    <meta name="description" content={siteDescription} />
+    <meta name="application-name" content={siteName} />
+    <meta name="author" content="lostinpatterns" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content={themeColor} />
+    <meta name="color-scheme" content="light" />
+
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" href={assetPath("favicon.ico")} sizes="any" />
+    <link rel="icon" type="image/svg+xml" href={assetPath("favicon.svg")} />
+    <link rel="icon" type="image/png" sizes="32x32" href={assetPath("favicon-32x32.png")} />
+    <link rel="icon" type="image/png" sizes="16x16" href={assetPath("favicon-16x16.png")} />
+    <link rel="apple-touch-icon" sizes="180x180" href={assetPath("apple-touch-icon.png")} />
+    <link rel="manifest" href={assetPath("site.webmanifest")} />
+
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={siteTitle} />
+    <meta property="og:description" content={siteDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:secure_url" content={socialImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={socialImageAlt} />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={siteTitle} />
+    <meta name="twitter:description" content={siteDescription} />
+    <meta name="twitter:image" content={socialImageUrl} />
+    <meta name="twitter:image:alt" content={socialImageAlt} />
   </head>
   <body>
     <main class="shell">

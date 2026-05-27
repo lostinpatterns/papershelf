@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="papershelf — Repo-local semantic search for coding agents">
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Pixelify+Sans:wght@400;700&amp;display=swap");
+
+    .title {
+      fill: #1f2523;
+      font-family: "Pixelify Sans", "Courier New", monospace;
+      font-size: 184px;
+      font-weight: 700;
+      letter-spacing: -0.07em;
+    }
+
+    .tagline,
+    .repo {
+      fill: #1f2523;
+      font-family: "IBM Plex Mono", "Courier New", monospace;
+    }
+
+    .tagline {
+      font-size: 34px;
+      font-weight: 400;
+    }
+
+    .repo {
+      font-size: 22px;
+      font-weight: 500;
+    }
+  </style>
+
+  <rect width="1200" height="630" fill="#faf7ef"/>
+  <text class="title" x="82" y="278">papershelf</text>
+  <text class="tagline" x="92" y="354">Repo-local semantic search for coding agents</text>
+  <text class="repo" x="92" y="548">github.com/lostinpatterns/papershelf</text>
+</svg>
