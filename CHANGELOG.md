@@ -6,6 +6,8 @@ This project follows Conventional Commits for commit messages. Release entries s
 
 ## Unreleased
 
+- Added `papershelf help`, `--help`/`-h`, and `--version`/`-v` CLI entry points.
+
 ## 0.1.0
 
 - Added the `papershelf` CLI with `init`, `index`, and `search --json` commands.

@@ -2,11 +2,22 @@ import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { runCli, usage } from './cli.js';
+import { packageVersion, runCli, usage } from './cli.js';
 
 describe('runCli', () => {
   it('prints usage without a command', async () => {
     await expect(runCli([])).resolves.toEqual({ stdout: usage, exitCode: 0 });
+  });
+
+  it('prints usage for help command and flags', async () => {
+    await expect(runCli(['help'])).resolves.toEqual({ stdout: usage, exitCode: 0 });
+    await expect(runCli(['--help'])).resolves.toEqual({ stdout: usage, exitCode: 0 });
+    await expect(runCli(['-h'])).resolves.toEqual({ stdout: usage, exitCode: 0 });
+  });
+
+  it('prints the package version for version flags', async () => {
+    await expect(runCli(['--version'])).resolves.toEqual({ stdout: packageVersion, exitCode: 0 });
+    await expect(runCli(['-v'])).resolves.toEqual({ stdout: packageVersion, exitCode: 0 });
   });
 
   it('initializes the docs directory and installs the bundled skill', async () => {
