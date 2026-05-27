@@ -2,18 +2,16 @@
 
 papershelf is a repo-local semantic retrieval layer for AI coding agents. It indexes research, specs, notes, docs, and other reference material from `.papershelf/docs/` into a local libSQL vector database, then exposes focused search through a CLI and installed agent skill.
 
-With papershelf, you can:
+## When to use papershelf
 
-- **Index repo-local reference material** — add papers, specs, design docs, notes, reports, or Markdown books under `.papershelf/docs/`.
-- **Retrieve task-specific evidence** — find the passages agents need before refactoring, implementing, or making design decisions.
-- **Use a narrow protocol** — run `papershelf search "<question>" --json` and inspect structured chunks, scores, and source metadata.
-- **Keep citations reproducible** — store the corpus and generated index in `.papershelf/`, cite document IDs, chunks, and locations, and refresh with `papershelf index`.
+Coding agents already have `read`, `rg`, and `find`; papershelf is not a replacement for known paths, well-named docs, or exact-keyword lookup. It is useful when agents need repo-local prose guidance but ordinary search would waste context: large or distributed documents, conceptual queries, lexically similar distractors, or task wording that differs from source wording.
 
-## Problem
+Use when:
 
-Coding agents already have `read`, `rg`, and `find`, and those remain best for exact strings, filenames, identifiers, error messages, citations, known terms, and expanded lexical queries. They still break down when reference material is long, prose-heavy, distributed, or described in vocabulary the agent's expansions miss. Reading whole papers or specs can also flood context when only a few passages matter.
-
-papershelf targets that retrieval gap: maintainers keep a repo-local Markdown/plain-text corpus, papershelf chunks and indexes it semantically, and agents retrieve the passages most likely to matter before coding or design decisions. It complements `rg` and `read` by producing candidate evidence with source paths, chunk numbers, line ranges, and quotes agents can cite.
+- an agent needs evidence from repo-local prose before coding or making a design decision
+- the relevant material is long, distributed, or vocabulary-mismatched with the task
+- exact search would require guessing many keywords or opening many similar files
+- answers should cite reproducible source paths, chunks, line ranges, and quotes
 
 ## Why papershelf
 
@@ -24,7 +22,7 @@ papershelf targets that retrieval gap: maintainers keep a repo-local Markdown/pl
 
 ## Table of Contents
 
-- [Problem](#problem)
+- [When to use papershelf](#when-to-use-papershelf)
 - [Why papershelf](#why-papershelf)
 - [Quickstart](#quickstart)
   - [1. Install](#1-install)
@@ -42,7 +40,6 @@ papershelf targets that retrieval gap: maintainers keep a repo-local Markdown/pl
   - [Search JSON contract](#search-json-contract)
   - [Citation contract](#citation-contract)
 - [Development and evals](#development-and-evals)
-- [Where it helps most](#where-it-helps-most)
 - [License](#license)
 
 ## Quickstart
@@ -234,10 +231,6 @@ The eval harnesses return normalized runs: app-facing `output`, traceable `sessi
 Provider calls for the core evals are recorded under `.vitest-evals/recordings/`, and the eval config runs in strict replay mode by default. Use `pnpm evals:record` with `ZEROENTROPY_API_KEY` when intentionally refreshing recordings.
 
 The optional agent compliance eval is gated by `PAPERSHELF_RUN_AGENT_EVALS=1`. It runs a Pi agent against the installed papershelf skill and asserts trace-level behavior: the agent must call `papershelf search ... --json`, cite an exact returned query/source/quote, and use returned line metadata for targeted reads in long documents.
-
-## Where it helps most
-
-The useful pattern is focused: papershelf helps agents reach relevant repo-local guidance with less document context. Ordinary tools can still work for well-named or exact-keyword docs, but papershelf can keep agents from loading long guides or opening many similar files. The advantage is clearest for large prose corpora, conceptual queries, lexically similar distractors, and task wording that differs from source wording.
 
 ## License
 
